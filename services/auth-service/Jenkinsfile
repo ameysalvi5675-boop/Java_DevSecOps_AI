@@ -1,4 +1,4 @@
-pipeline{
+pipeline {
 
     agent any
 
@@ -16,25 +16,26 @@ pipeline{
 
         stage('Build Maven') {
             steps {
-                bat '.\\mvnw.cmd clean package'
+                sh 'chmod +x mvnw'
+                sh './mvnw clean package'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t %IMAGE_NAME% .'
+                sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                bat 'kubectl apply -f k8s/'
+                sh 'kubectl apply -f k8s/'
             }
         }
 
         stage('Verify Deployment') {
             steps {
-                bat 'kubectl get pods -n devsecops-ai'
+                sh 'kubectl get pods -n devsecops-ai'
             }
         }
     }
