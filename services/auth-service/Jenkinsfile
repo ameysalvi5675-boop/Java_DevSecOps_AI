@@ -1,0 +1,41 @@
+pipeline{
+
+    agent any
+
+    environment {
+        IMAGE_NAME = "auth-service:v1"
+    }
+
+    stages {
+
+        stage('Clone Repository') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Maven') {
+            steps {
+                bat '.\\mvnw.cmd clean package'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t %IMAGE_NAME% .'
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                bat 'kubectl apply -f k8s/'
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                bat 'kubectl get pods -n devsecops-ai'
+            }
+        }
+    }
+}
