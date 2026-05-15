@@ -16,20 +16,26 @@ pipeline {
 
         stage('Build Maven') {
             steps {
-                sh 'chmod +x mvnw.cmd'
-                sh './mvnw.cmd clean package'
+                dir('services/auth-service') {
+                    sh 'chmod +x mvnw'
+                    sh './mvnw clean package'
+                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
+                dir('services/auth-service') {
+                    sh 'docker build -t $IMAGE_NAME .'
+                }
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl apply -f k8s/'
+                dir('services/auth-service') {
+                    sh 'kubectl apply -f k8s/'
+                }
             }
         }
 
